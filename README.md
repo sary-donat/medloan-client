@@ -4,19 +4,36 @@
 מנהל מקבל תפריט "ניהול": השאלות, פריטים ועותקים, קטגוריות, תגיות וחברים.
 התפריט וה-route guard הם לנוחות בלבד. השרת בודק את ההרשאה בכל בקשה.
 
+- אתר: https://medloan-client.onrender.com
+- שרת: https://medloan-server.onrender.com (Swagger: https://medloan-server.onrender.com/swagger)
+
+בגישה הראשונה אחרי זמן בלי שימוש, הטעינה יכולה לקחת עד דקה.
+
 ## הרצה
 
-השרת (`MedLoan.Api`) צריך לרוץ במקביל, על `http://localhost:5062`.
+דרישות: Node 22 ומעלה.
 
-```
+השרת (`MedLoan.Api`) צריך לרוץ במקביל, על `http://localhost:5062`. ההוראות להרצה שלו ב-README של ה-repo `medloan-server`.
+
+```bash
 npm install
 cp .env.example .env
 npm run dev
 ```
 
-ב-Windows (PowerShell), במקום `cp`: `Copy-Item .env.example .env`.
+ב-Windows (PowerShell), במקום `cp`:
 
-האפליקציה נפתחת ב-`http://localhost:5173`. השרת מתיר CORS רק לכתובת הזו.
+```powershell
+Copy-Item .env.example .env
+```
+
+האפליקציה נפתחת ב-`http://localhost:5173`. השרת מתיר CORS בפיתוח רק לכתובת הזו.
+
+בנייה לפריסה (התוצאה בתיקייה `dist`):
+
+```bash
+npm run build
+```
 
 ## הגדרות
 
