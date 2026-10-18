@@ -56,6 +56,23 @@ export function errorMessage(error) {
   return data?.title ?? 'אירעה שגיאה';
 }
 
+// For admin forms: a 400 with errors is split by field. Keys come as "Name", "$.name" or "CategoryId",
+// so they are matched to the form's field names without case and without "$.".
+// Unmatched keys, and any error without errors (409, 400 with detail only), go under _form.
+export function fieldErrors(error, fields) {
+  const errors = error.response?.status === 400 ? error.response.data?.errors : null;
+  if (!errors) return { _form: errorMessage(error) };
+
+  const byKey = Object.fromEntries(fields.map((f) => [f.toLowerCase(), f]));
+  const result = {};
+  for (const [key, messages] of Object.entries(errors)) {
+    const name = byKey[key.replace(/^\$\./, '').toLowerCase()] ?? '_form';
+    const text = [].concat(messages).join(' ');
+    result[name] = result[name] ? `${result[name]} ${text}` : text;
+  }
+  return result;
+}
+
 export function formatDate(value) {
   return value ? new Date(value).toLocaleDateString('he-IL') : '';
 }

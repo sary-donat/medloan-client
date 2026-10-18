@@ -127,3 +127,78 @@ td {
   gap: 6px;
   align-items: flex-start;
 }
+
+/* Admin area */
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #d9e2ec;
+}
+
+.admin-nav a.active {
+  font-weight: bold;
+}
+
+.form.wide {
+  max-width: 560px;
+}
+
+textarea {
+  font: inherit;
+  padding: 6px 8px;
+}
+
+.form label.check,
+.filters label.check,
+.checks label.check {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  border: 1px solid #d9e2ec;
+  border-radius: 6px;
+}
+
+.field-error {
+  color: #9b1c1c;
+  font-size: 0.9em;
+}
+
+.inline-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  margin-top: 16px;
+}
+
+.inline-form h3,
+.inline-form > p {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.inline-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inline-form button {
+  align-self: flex-end;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}

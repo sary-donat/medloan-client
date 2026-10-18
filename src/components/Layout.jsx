@@ -13,6 +13,7 @@ export default function Layout() {
         <nav>
           <NavLink to="/" end>רשימת ציוד</NavLink>
           {auth && <NavLink to="/my-loans">ההשאלות שלי</NavLink>}
+          {auth?.role === 'Admin' && <NavLink to="/admin">ניהול</NavLink>}
         </nav>
         <div className="user">
           {auth ? (
