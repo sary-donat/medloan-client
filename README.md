@@ -26,6 +26,19 @@ npm run dev
 
 הקובץ `.env` לא נכנס ל-repo.
 
+## פריסה ל-Render (Static Site)
+
+| הגדרה | ערך |
+|---|---|
+| Build Command | `npm install && npm run build` |
+| Publish Directory | `dist` |
+| Environment Variable | `VITE_API_URL` = כתובת השרת ב-Render, למשל `https://<server>.onrender.com` (בלי `/` בסוף) |
+| Redirects/Rewrites | Source `/*`, Destination `/index.html`, Action `Rewrite` |
+
+- `VITE_API_URL` נקרא **בזמן הבנייה** ונכנס לקוד שנבנה. אחרי שינוי שלו צריך להריץ build מחדש של ה-Static Site (Manual Deploy).
+- ה-rewrite נדרש כי הניווט נעשה בצד הלקוח (`react-router-dom`). בלי ה-rewrite, רענון של כתובת כמו `/my-loans` מחזיר 404.
+- בשרת, `Cors__AllowedOrigins__0` צריך להיות הכתובת של ה-Static Site, אחרת הדפדפן חוסם את הבקשות.
+
 ## משתמשי דמו
 
 | Email | Password |
