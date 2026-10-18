@@ -2,10 +2,16 @@ import axios from 'axios';
 
 const TOKEN_KEY = 'medloan.auth';
 export const LOGIN_URL = '/api/auth/login';
+export const REGISTER_URL = '/api/auth/register';
+export const LOGOUT_URL = '/api/auth/logout';
+const REFRESH_URL = '/api/auth/refresh';
+
+// A 401 from these is not an expired access token, so no refresh is tried (11.13).
+const NO_REFRESH_URLS = [LOGIN_URL, REGISTER_URL, REFRESH_URL];
 
 export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL });
 
-// The saved AuthResponse: { token, expiresAt, memberId, fullName, role }.
+// The saved AuthResponse: { token, expiresAt, refreshToken, refreshTokenExpiresAt, memberId, fullName, role }.
 export function loadAuth() {
   try {
     const raw = localStorage.getItem(TOKEN_KEY);
@@ -23,10 +29,15 @@ export function clearAuth() {
   localStorage.removeItem(TOKEN_KEY);
 }
 
-// Set by AuthProvider, which can navigate; the interceptor itself is outside React.
+// Set by AuthProvider, which can navigate and hold state; the interceptor itself is outside React.
 let onUnauthorized = () => {};
 export function setUnauthorizedHandler(handler) {
   onUnauthorized = handler;
+}
+
+let onRefreshed = () => {};
+export function setRefreshedHandler(handler) {
+  onRefreshed = handler;
 }
 
 api.interceptors.request.use((config) => {
@@ -35,14 +46,47 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// One refresh request at a time: requests that fail together all wait for the same one.
+// The server rotates the refresh token, so a second parallel refresh would look like reuse.
+let refreshing = null;
+function refreshSession() {
+  if (!refreshing) {
+    const refreshToken = loadAuth()?.refreshToken;
+    refreshing = (refreshToken ? api.post(REFRESH_URL, { refreshToken }) : Promise.reject(new Error('No refresh token')))
+      .then(({ data }) => {
+        saveAuth(data);
+        onRefreshed(data);
+        return data;
+      })
+      .finally(() => {
+        refreshing = null;
+      });
+  }
+  return refreshing;
+}
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const { config, response } = error;
     // A 401 from login means wrong credentials and is shown in the form, not a lost session.
-    if (error.response?.status === 401 && error.config?.url !== LOGIN_URL) {
-      clearAuth();
-      onUnauthorized();
+    if (response?.status !== 401 || !config || NO_REFRESH_URLS.includes(config.url)) {
+      return Promise.reject(error);
     }
+
+    // One refresh attempt per request. A 401 on the retried request comes back here with _retried set,
+    // and ends the session.
+    if (!config._retried) {
+      const auth = await refreshSession().catch(() => null);
+      if (auth) {
+        config._retried = true;
+        config.headers.Authorization = `Bearer ${auth.token}`;
+        return api(config);
+      }
+    }
+
+    clearAuth();
+    onUnauthorized();
     return Promise.reject(error);
   },
 );

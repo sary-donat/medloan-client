@@ -20,7 +20,7 @@ export default function Layout() {
             <>
               {/* The role comes from AuthResponse and is for display only (11.12). */}
               <span>{auth.fullName} ({roleLabels[auth.role] ?? auth.role})</span>
-              <button type="button" onClick={logout}>התנתקות</button>
+              <button type="button" onClick={logout}>התנתק</button>
             </>
           ) : (
             <>
