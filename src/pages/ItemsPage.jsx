@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, errorMessage } from '../api/client';
+import ItemImage from '../components/ItemImage';
 
 export default function ItemsPage() {
   const [categories, setCategories] = useState([]);
@@ -71,10 +72,13 @@ export default function ItemsPage() {
 
       <ul className="items">
         {items.map((item) => (
-          <li key={item.id} className="card">
-            <Link to={`/items/${item.id}`}><strong>{item.name}</strong></Link>
+          <li key={item.id} className="card item-card">
+            <Link to={`/items/${item.id}`}>
+              <ItemImage itemId={item.id} name={item.name} />
+              <strong>{item.name}</strong>
+            </Link>
             <div className="muted">{item.categoryName}{item.manufacturer && ` · ${item.manufacturer}`}</div>
-            <div className={item.availableCopies > 0 ? 'available' : 'unavailable'}>
+            <div className={`pill ${item.availableCopies > 0 ? 'available' : 'unavailable'}`}>
               {item.availableCopies} זמינים
             </div>
           </li>

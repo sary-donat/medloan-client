@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Source images for the design (13a); only public/images is committed
+design-images/

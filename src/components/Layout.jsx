@@ -1,5 +1,6 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { LOGO } from '../itemImages';
 
 const roleLabels = { Admin: 'מנהל', Member: 'חבר' };
 
@@ -9,7 +10,10 @@ export default function Layout() {
   return (
     <>
       <header className="topbar">
-        <strong>גמ"ח ציוד רפואי</strong>
+        <Link to="/" className="brand">
+          <img src={LOGO} alt="" className="brand-logo" />
+          <span>רפו"ש – השאלת ציוד רפואי</span>
+        </Link>
         <nav>
           <NavLink to="/" end>רשימת ציוד</NavLink>
           {auth && <NavLink to="/my-loans">ההשאלות שלי</NavLink>}
@@ -20,7 +24,7 @@ export default function Layout() {
             <>
               {/* The role comes from AuthResponse and is for display only (11.12). */}
               <span>{auth.fullName} ({roleLabels[auth.role] ?? auth.role})</span>
-              <button type="button" onClick={logout}>התנתק</button>
+              <button type="button" className="secondary" onClick={logout}>התנתק</button>
             </>
           ) : (
             <>

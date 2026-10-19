@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { api, errorMessage, formatDate } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { copyStatusLabel } from '../copyStatus';
+import ItemImage from '../components/ItemImage';
 
 const CONFLICT_BANNER = 'העותק נתפס על ידי משתמש אחר. נא לרענן ולנסות שוב.';
 
@@ -54,18 +55,27 @@ export default function ItemDetailsPage() {
 
   return (
     <section>
-      <Link to="/">→ חזרה לרשימה</Link>
-      <h1>{item.name}</h1>
-      <p className="muted">
-        {item.categoryName}
-        {item.manufacturer && ` · ${item.manufacturer}`}
-        {item.tags.length > 0 && ` · ${item.tags.map((t) => t.name).join(', ')}`}
-      </p>
-      {item.description && <p>{item.description}</p>}
-      <p>
-        תקופת השאלה: עד {item.maxLoanDays} ימים
-        {item.requiresDeposit && ` · נדרש פיקדון${item.depositAmount != null ? ` של ${item.depositAmount} ש"ח` : ''}`}
-      </p>
+      <Link to="/" className="back">→ חזרה לרשימה</Link>
+      <div className="item-details card">
+        <ItemImage itemId={item.id} name={item.name} className="large" />
+        <div>
+          <h1>{item.name}</h1>
+          <p className="muted">
+            {item.categoryName}
+            {item.manufacturer && ` · ${item.manufacturer}`}
+          </p>
+          {item.tags.length > 0 && (
+            <ul className="tags">
+              {item.tags.map((t) => <li key={t.id} className="tag">{t.name}</li>)}
+            </ul>
+          )}
+          {item.description && <p>{item.description}</p>}
+          <p>
+            תקופת השאלה: עד {item.maxLoanDays} ימים
+            {item.requiresDeposit && ` · נדרש פיקדון${item.depositAmount != null ? ` של ${item.depositAmount} ש"ח` : ''}`}
+          </p>
+        </div>
+      </div>
 
       {conflict && (
         <div className="banner" role="alert">
@@ -87,7 +97,7 @@ export default function ItemDetailsPage() {
             <tr key={copy.id}>
               <td dir="ltr">{copy.serialNumber}</td>
               <td>{copy.condition}</td>
-              <td>{copyStatusLabel(copy.status)}</td>
+              <td><span className={`badge status-${copy.status}`}>{copyStatusLabel(copy.status)}</span></td>
               <td>
                 {copy.status === 'Available' && (
                   <button type="button" onClick={() => borrow(copy.id)} disabled={busyCopyId !== null}>
