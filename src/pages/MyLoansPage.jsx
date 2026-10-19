@@ -1,36 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, errorMessage, formatDate } from '../api/client';
 
+// Read only: a member borrows by themselves, but only the gemach (Admin) confirms a return.
 export default function MyLoansPage() {
   const [loans, setLoans] = useState(null);
   const [error, setError] = useState('');
-  const [busyLoanId, setBusyLoanId] = useState(null);
 
   // Full list from the server, newest first, no paging.
-  const load = useCallback(() => {
-    return api
+  useEffect(() => {
+    api
       .get('/api/members/me/loans')
       .then((r) => setLoans(r.data))
       .catch((e) => setError(errorMessage(e)));
   }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  async function returnLoan(loanId) {
-    setError('');
-    setBusyLoanId(loanId);
-    try {
-      await api.patch(`/api/loans/${loanId}`, { returned: true });
-    } catch (e) {
-      setError(errorMessage(e));
-    } finally {
-      setBusyLoanId(null);
-      await load();
-    }
-  }
 
   if (loans === null) return error ? <p className="error">{error}</p> : <p>טוען...</p>;
 
@@ -53,13 +36,7 @@ export default function MyLoansPage() {
                 <td>{formatDate(loan.loanedAt)}</td>
                 <td>{formatDate(loan.dueAt)}</td>
                 <td>{loan.status === 'Active' ? 'פעילה' : `הוחזרה ב-${formatDate(loan.returnedAt)}`}</td>
-                <td>
-                  {loan.status === 'Active' && (
-                    <button type="button" onClick={() => returnLoan(loan.id)} disabled={busyLoanId !== null}>
-                      החזר
-                    </button>
-                  )}
-                </td>
+                <td>{loan.status === 'Active' && 'להחזרה יש להביא את הציוד לגמ"ח'}</td>
               </tr>
             ))}
           </tbody>
